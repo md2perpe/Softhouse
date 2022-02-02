@@ -7,149 +7,113 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+
 public class Converter
 {
+    private BufferedReader in;
+    private XMLStreamWriter out;
 
-    public static void main(String[] args)
+    boolean isWritingPerson = false;
+    boolean isWritingFamily = false;
+
+    public Converter(FileReader inFile, FileWriter outFile)
+        throws XMLStreamException
     {
-        try {
-
-            String infile = args[0];
-            String outfile = args[1];
-
-            BufferedReader lineReader = new BufferedReader(
-                new FileReader(infile)
-            );
-
-            XMLOutputFactory outputFactory = XMLOutputFactory.newFactory();
-            XMLStreamWriter xmlStreamWriter = outputFactory.createXMLStreamWriter(
-                new FileWriter(outfile)
-            );
-
-            convert(lineReader, xmlStreamWriter);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        in = new BufferedReader(inFile);
+        out = XMLOutputFactory.newFactory().createXMLStreamWriter(outFile);
     }
 
-    static void convert(BufferedReader in, XMLStreamWriter out)
+    void run()
         throws IOException, XMLStreamException
     {
         out.writeStartDocument();
         out.writeStartElement("people");
 
-        boolean isWritingPerson = false;
-        boolean isWritingFamily = false;
-
         String line;
         while ((line=in.readLine()) != null)
         {
             String[] parts = line.split("\\|");
+
             switch (parts[0])
             {
-                case "P":
-                    if (isWritingFamily) {
-                        out.writeEndElement();
-                    }
-
-                    if (isWritingPerson) {
-                        out.writeEndElement();
-                    }
-
-                    isWritingPerson = true;
-                    isWritingFamily = false;
-
-                    out.writeStartElement("person");
-
-                    if (parts.length > 1)
-                    {
-                        out.writeStartElement("firstname");
-                        out.writeCharacters(parts[1]);
-                        out.writeEndElement();
-
-                        if (parts.length > 2)
-                        {
-                            out.writeStartElement("lastname");
-                            out.writeCharacters(parts[2]);
-                            out.writeEndElement();
-                        }
-                    }
-                    break;
-
-                case "T":
-                    out.writeStartElement("phone");
-
-                    if (parts.length > 1)
-                    {
-                        out.writeStartElement("mobile");
-                        out.writeCharacters(parts[1]);
-                        out.writeEndElement();
-
-                        if (parts.length > 2)
-                        {
-                            out.writeStartElement("landline");
-                            out.writeCharacters(parts[2]);
-                            out.writeEndElement();
-                        }
-                    }
-
-                    out.writeEndElement();
-                    break;
-
-                case "A":
-                    out.writeStartElement("address");
-
-                    if (parts.length > 1)
-                    {
-                        out.writeStartElement("street");
-                        out.writeCharacters(parts[1]);
-                        out.writeEndElement();
-
-                        if (parts.length > 2)
-                        {
-                            out.writeStartElement("city");
-                            out.writeCharacters(parts[2]);
-                            out.writeEndElement();
-                        }
-
-                        if (parts.length > 3)
-                        {
-                            out.writeStartElement("zipcode");
-                            out.writeCharacters(parts[3]);
-                            out.writeEndElement();
-                        }
-                    }
-
-                    out.writeEndElement();
-                    break;
-
-                case "F":
-                    if (isWritingFamily) {
-                        out.writeEndElement();
-                    }
-
-                    isWritingFamily = true;
-                    out.writeStartElement("family");
-
-                    if (parts.length > 1)
-                    {
-                        out.writeStartElement("name");
-                        out.writeCharacters(parts[1]);
-                        out.writeEndElement();
-
-                        if (parts.length > 2)
-                        {
-                            out.writeStartElement("born");
-                            out.writeCharacters(parts[2]);
-                            out.writeEndElement();
-                        }
-                    }
-                    break;
-
+                case "P": handleP(parts); break;
+                case "T": handleT(parts); break;
+                case "A": handleA(parts); break;
+                case "F": handleF(parts); break;
             }
         }
 
         out.close();    // Writes necessary end tags
+    }
+
+
+    private void writeParts(String[] parts, String[] tagNames)
+        throws XMLStreamException
+    {
+        int i;
+        for (i=0; i+1<parts.length && i<tagNames.length; i++) {
+            out.writeStartElement(tagNames[i]);
+            out.writeCharacters(parts[i+1]);
+            out.writeEndElement();
+        }
+    }
+
+    private void handleP(String[] parts) throws XMLStreamException {
+        if (isWritingFamily) {
+            out.writeEndElement();
+        }
+
+        if (isWritingPerson) {
+            out.writeEndElement();
+        }
+
+        isWritingPerson = true;
+        isWritingFamily = false;
+
+        out.writeStartElement("person");
+        writeParts(parts, new String[] { "firstname", "lastname" });
+    }
+
+    private void handleT(String[] parts) throws XMLStreamException {
+        if (parts.length < 2)
+            return;
+
+        out.writeStartElement("phone");
+        writeParts(parts, new String[] { "mobile", "landline" });
+        out.writeEndElement();
+    }
+
+    private void handleA(String[] parts) throws XMLStreamException {
+        if (parts.length < 2)
+            return;
+
+        out.writeStartElement("address");
+        writeParts(parts, new String[] { "street", "city", "zipcode" });
+        out.writeEndElement();
+    }
+
+    private void handleF(String[] parts) throws XMLStreamException {
+        if (isWritingFamily) {
+            out.writeEndElement();
+        }
+
+        isWritingFamily = true;
+        out.writeStartElement("family");
+        writeParts(parts, new String[] {"name", "born" });
+    }
+
+
+    public static void main(String[] args)
+    {
+        try {
+            Converter converter = new Converter(
+                new FileReader(args[0]),
+                new FileWriter(args[1])
+            );
+            converter.run();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
