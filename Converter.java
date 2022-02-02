@@ -61,22 +61,39 @@ public class Converter
                     isWritingFamily = false;
 
                     out.writeStartElement("person");
-                    out.writeStartElement("firstname");
-                    out.writeCharacters(parts[1]);
-                    out.writeEndElement();
-                    out.writeStartElement("lastname");
-                    out.writeCharacters(parts[2]);
-                    out.writeEndElement();
+
+                    if (parts.length > 1)
+                    {
+                        out.writeStartElement("firstname");
+                        out.writeCharacters(parts[1]);
+                        out.writeEndElement();
+
+                        if (parts.length > 2)
+                        {
+                            out.writeStartElement("lastname");
+                            out.writeCharacters(parts[2]);
+                            out.writeEndElement();
+                        }
+                    }
                     break;
 
                 case "T":
                     out.writeStartElement("phone");
-                    out.writeStartElement("mobile");
-                    out.writeCharacters(parts[1]);
-                    out.writeEndElement();
-                    out.writeStartElement("landline");
-                    out.writeCharacters(parts[2]);
-                    out.writeEndElement();
+
+                    if (parts.length > 1)
+                    {
+                        out.writeStartElement("mobile");
+                        out.writeCharacters(parts[1]);
+                        out.writeEndElement();
+
+                        if (parts.length > 2)
+                        {
+                            out.writeStartElement("landline");
+                            out.writeCharacters(parts[2]);
+                            out.writeEndElement();
+                        }
+                    }
+
                     out.writeEndElement();
                     break;
 
@@ -115,13 +132,20 @@ public class Converter
                     isWritingFamily = true;
                     out.writeStartElement("family");
 
-                    out.writeStartElement("name");
-                    out.writeCharacters(parts[1]);
-                    out.writeEndElement();
+                    if (parts.length > 1)
+                    {
+                        out.writeStartElement("name");
+                        out.writeCharacters(parts[1]);
+                        out.writeEndElement();
 
-                    out.writeStartElement("born");
-                    out.writeCharacters(parts[2]);
-                    out.writeEndElement();
+                        if (parts.length > 2)
+                        {
+                            out.writeStartElement("born");
+                            out.writeCharacters(parts[2]);
+                            out.writeEndElement();
+                        }
+                    }
+                    break;
 
             }
         }
