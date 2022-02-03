@@ -5,6 +5,12 @@ the task I was given by [Softhouse](https://www.softhouse.se/)
 as part of a recruitment process.
 
 
+## Usage
+
+```
+java Converter <infile> <outfile>
+```
+
 ## Task
 
 Convert from a row-based file format to an XML format.
