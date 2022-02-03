@@ -47,6 +47,15 @@ public class Converter
     }
 
 
+    // Helper method to map a line of data into XML elements
+    // Note: First element of `parts` is not used.
+    // Example:
+    //     String[] parts = new String[] { "X", "Barack", "Obama" }
+    //     String[] tagNames = new String[] { "firstname", "lastname" }
+    //     writeParts(parts, tagNames)
+    // gives
+    //     <firstname>Barack</firstname>
+    //     <lastname>Obama</lastname>
     private void writeParts(String[] parts, String[] tagNames)
         throws XMLStreamException
     {
