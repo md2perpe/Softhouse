@@ -8,7 +8,7 @@ as part of a recruitment process.
 ## Usage
 
 ```
-java Converter <infile> <outfile>
+java -jar softhouse.jag <infile> <outfile>
 ```
 
 ## Task
