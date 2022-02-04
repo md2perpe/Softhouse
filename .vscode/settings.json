@@ -1,0 +1,9 @@
+{
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.project.outputPath": "bin",
+    "terminal.integrated.env.linux": {
+        "CLASSPATH": "bin"
+    }
+}
